@@ -2,3 +2,4 @@
 __pycache__/
 *.jsonl
 node_modules/
+planner_data.json
