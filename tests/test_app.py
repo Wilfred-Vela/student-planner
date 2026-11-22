@@ -160,6 +160,15 @@ class TestHandle(HandleTestCase):
         self.assertEqual([a["title"] for a in body["overdue"]], ["Late"])
         self.assertEqual([a["title"] for a in body["upcoming"]], ["Soon"])
 
+    def test_R12_get_data_courses_have_incomplete_count(self):
+        aid = self.make_assignment(title="A")[1]["id"]
+        self.make_assignment(title="B")
+        self.call("PUT", f"/api/assignments/{aid}", {"completed": True})
+        self.make_course("MAT 150")
+        courses = self.call("GET", "/api/data")[1]["courses"]
+        self.assertEqual([(c["name"], c["incomplete_count"]) for c in courses],
+                         [("CSC 299", 1), ("MAT 150", 0)])
+
     def test_R1_unknown_route_is_404(self):
         self.assertEqual(self.call("GET", "/nope")[0], 404)
 

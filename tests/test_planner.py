@@ -208,6 +208,32 @@ class TestUpcomingOverdue(PlannerTestCase):
         )
 
 
+class TestIncompleteCounts(PlannerTestCase):
+    def test_R12_incomplete_count_per_course(self):
+        other = self.p.add_course("MAT 150")
+        empty = self.p.add_course("HIS 101")
+        self.add("HW1")
+        self.add("HW2")
+        done = self.add("HW3")
+        self.p.set_completed(done["id"], True)
+        self.add("Quiz", course_id=other["id"])
+        self.assertEqual(self.p.incomplete_counts(), {
+            self.course["id"]: 2, other["id"]: 1, empty["id"]: 0})
+
+    def test_R12_count_follows_completion_edit_and_delete(self):
+        other = self.p.add_course("MAT 150")
+        a = self.add("HW1")
+        b = self.add("HW2")
+        self.p.set_completed(a["id"], True)
+        self.p.update_assignment(b["id"], course_id=other["id"])
+        self.assertEqual(self.p.incomplete_counts(),
+                         {self.course["id"]: 0, other["id"]: 1})
+        self.p.set_completed(a["id"], False)
+        self.p.delete_assignment(b["id"])
+        self.assertEqual(self.p.incomplete_counts(),
+                         {self.course["id"]: 1, other["id"]: 0})
+
+
 class TestPersistence(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
