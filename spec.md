@@ -1,6 +1,6 @@
 # Student Planner — Specification
 
-Derived from `problem.md`. Each requirement keeps its ID (R1–R11) so tests can
+Derived from `problem.md`. Each requirement keeps its ID (R1–R12) so tests can
 be traced back to it (`test_R<n>_...`).
 
 ## Constraints
@@ -71,13 +71,20 @@ into `400` with `{"error": "<message>"}`. Unknown IDs raise `KeyError` → `404`
   `PLANNER_DATA` env var). A new `Planner` opened on the same file sees the same
   courses and assignments. Writes are atomic (temp file + `os.replace`) so a
   crash mid-write cannot corrupt the file. A missing file means an empty planner.
+- **R12 — Incomplete count per course.** `incomplete_counts()` returns
+  `{course_id: n}` for every course, where `n` is the number of its assignments
+  with `completed == false` (courses with none map to `0`). The count is computed
+  from current data, not stored, so completing, editing (including moving to
+  another course), and deleting assignments are reflected immediately.
+  `GET /api/data` adds `incomplete_count` to each course, and the page shows a
+  **Courses** list with each course's count.
 
 ## HTTP API
 
 | method | path | body | result |
 |--------|------|------|--------|
 | GET | `/` | — | HTML page |
-| GET | `/api/data` | — | `{today, courses, assignments, upcoming, overdue}` |
+| GET | `/api/data` | — | `{today, courses, assignments, upcoming, overdue}`; each course has `incomplete_count` |
 | POST | `/api/courses` | `{name}` | `201` course |
 | POST | `/api/assignments` | `{title, description, course_id, due_date}` | `201` assignment |
 | PUT | `/api/assignments/<id>` | any editable fields | `200` assignment |

@@ -7,6 +7,7 @@ It helps you keep track of assignments across all your courses:
 - See every assignment in one place, split into **Overdue**, **Upcoming (next 7 days)**,
   **All incomplete**, and **Completed**.
 - Mark assignments completed (or not), edit them, and delete them.
+- See each course with how many incomplete assignments it still has.
 - Everything is saved to a local JSON file (`planner_data.json`), so your data is
   still there after you close and reopen the app.
 
