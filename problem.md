@@ -13,3 +13,6 @@ Students often struggle to keep track of assignments, deadlines, and responsibil
 - R9: The app must distinguish between completed and incomplete assignments.
 - R10: The app must display upcoming and overdue assignments.
 - R11: Assignment and course information must be saved locally so it remains available after closing and reopening the app.
+
+# Additional requirements
+- R12: The app must show, for each course, how many incomplete assignments it has.
