@@ -24,6 +24,12 @@ def _with_status(items, today):
     return [{**a, "status": Planner.status(a, today)} for a in items]
 
 
+def _courses_with_counts(planner):
+    counts = planner.incomplete_counts()
+    return [{**c, "incomplete_count": counts[c["id"]]}
+            for c in planner.list_courses()]
+
+
 def handle(planner, method, path, body, today):
     """Route one request. Returns (status_code, payload).
 
@@ -39,7 +45,7 @@ def handle(planner, method, path, body, today):
         if method == "GET" and path == "/api/data":
             return 200, {
                 "today": today.isoformat(),
-                "courses": planner.list_courses(),
+                "courses": _courses_with_counts(planner),
                 "assignments": _with_status(planner.list_assignments(), today),
                 "upcoming": _with_status(planner.upcoming(today), today),
                 "overdue": _with_status(planner.overdue(today), today),
@@ -180,6 +186,7 @@ PAGE = """<!doctype html>
   </form>
 </section>
 
+<section><h2>Courses</h2><ul id="courses"></ul></section>
 <section><h2>Overdue</h2><ul id="overdue"></ul></section>
 <section><h2>Upcoming (next 7 days)</h2><ul id="upcoming"></ul></section>
 <section><h2>All incomplete</h2><ul id="incomplete"></ul></section>
@@ -242,6 +249,12 @@ function render() {
       ? "Choose a course" : "Add a course first"}),
     ...state.courses.map(c => el("option", {value: c.id, textContent: c.name})));
   sel.value = current;
+  $("#courses").replaceChildren(...(state.courses.length
+    ? state.courses.map(c => el("li", {}, [
+        el("strong", {className: "main", textContent: c.name}),
+        el("span", {className: "meta",
+                    textContent: `${c.incomplete_count} incomplete`})]))
+    : [el("li", {className: "empty", textContent: "No courses yet."})]));
   fill("overdue", state.overdue);
   fill("upcoming", state.upcoming);
   fill("incomplete", state.assignments.filter(a => !a.completed));

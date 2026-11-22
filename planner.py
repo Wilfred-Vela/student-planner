@@ -80,6 +80,14 @@ class Planner:
         self._save()
         return dict(course)
 
+    def incomplete_counts(self):
+        """R12: {course_id: number of incomplete assignments}, 0 included."""
+        counts = {c["id"]: 0 for c in self._data["courses"]}
+        for a in self._data["assignments"]:
+            if not a["completed"] and a["course_id"] in counts:
+                counts[a["course_id"]] += 1
+        return counts
+
     def _course_name(self, course_id):
         for c in self._data["courses"]:
             if c["id"] == course_id:
